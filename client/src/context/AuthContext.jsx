@@ -11,11 +11,18 @@ export const AuthProvider = ({ children }) => {
     const token = localStorage.getItem('token');
     const stored = localStorage.getItem('user');
     if (token && stored) {
-      setUser(JSON.parse(stored));
+      const parsedUser = JSON.parse(stored);
+      setUser(parsedUser);
+      
       API.get('/api/auth/me')
         .then((res) => {
-          setUser(res.data);
-          localStorage.setItem('user', JSON.stringify(res.data));
+          const updatedUser = { 
+            ...res.data, 
+            token: token, 
+            profilePicture: res.data.profilePicture || res.data.avatar 
+          };
+          setUser(updatedUser);
+          localStorage.setItem('user', JSON.stringify(updatedUser));
         })
         .catch(() => {
           localStorage.removeItem('token');
@@ -67,7 +74,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-      <AuthContext.Provider value={{ user, loading, login, register, googleLogin, updateUser, logout, setUser }}>
+    <AuthContext.Provider value={{ user, loading, login, register, googleLogin, updateUser, logout, setUser }}>
       {children}
     </AuthContext.Provider>
   );
