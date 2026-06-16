@@ -9,6 +9,10 @@
 </p>
 
 <p align="center">
+  <a href="https://skilzavo.vercel.app"><img src="https://img.shields.io/badge/🚀_Live_Demo-skilzavo.vercel.app-84CC16?style=for-the-badge&labelColor=0f172a" alt="Live Demo"></a>
+</p>
+
+<p align="center">
   <img src="https://img.shields.io/badge/React-18-0A7C72?style=flat&logo=react&labelColor=0f172a">
   <img src="https://img.shields.io/badge/Node.js-20-339933?style=flat&logo=nodedotjs&labelColor=0f172a">
   <img src="https://img.shields.io/badge/MongoDB-Atlas-47A248?style=flat&logo=mongodb&labelColor=0f172a">
