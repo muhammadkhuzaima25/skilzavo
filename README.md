@@ -27,19 +27,7 @@
 
 <!-- SEO TAGS -->
 <!--
-skilzavo, freelance marketplace, freelance service platform, freelance services,
-mern stack project, full stack web app, react freelance marketplace,
-hire freelancers, freelance platform, service marketplace,
-find freelancers, freelance jobs, freelance gigs,
-real-time chat application, socket.io chat, project management app,
-gantt chart project timeline, freelance management system,
-mern stack portfolio project, react nodejs mongodb express,
-freelancing in pakistan, freelance platform for pakistan,
-service provider platform, freelance dashboard,
-google oauth login, jwt authentication mern,
-cloudinary image upload, multer file upload,
-online freelancing platform, freelancer client portal,
-skill marketplace, talent marketplace, gig platform
+skilzavo, freelance marketplace, service platform, MERN stack project, full stack web app, React developer portfolio, project management dashboard, socket.io chat application, Gantt chart timeline, freelancing in Pakistan, cloud image hosting, JWT authentication, Google OAuth login, client portal, currency converter, software engineering student project
 -->
 
 ---
