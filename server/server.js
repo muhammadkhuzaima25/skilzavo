@@ -27,12 +27,22 @@ app.use(cors());
 app.use(express.json());
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
+// --- APIS BASE ROUTES ---
 app.use('/api/auth', authRoutes);
 app.use('/api/services', serviceRoutes);
 app.use('/api/requests', requestRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/messages', messageRoutes);
+
+// --- SIMPLE TESTING ROUTES ---
+app.get('/', (req, res) => {
+  res.send('Skilzavo Backend is running successfully!');
+});
+
+app.get('/status', (req, res) => {
+  res.json({ message: "Backend is perfectly live!" });
+});
 
 app.get('/api/health', (req, res) => {
   const dbState = mongoose.connection.readyState;
@@ -42,6 +52,7 @@ app.get('/api/health', (req, res) => {
     2: 'connecting',
     3: 'disconnecting',
   };
+  
   res.json({
     status: 'ok',
     message: 'Skilzavo API is running',
