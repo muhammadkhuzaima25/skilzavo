@@ -348,7 +348,7 @@ Messages are persisted in MongoDB and fetched via REST API (`GET /api/messages/:
 ---
 
 ## 🔍 SEO Keywords
-`freelance marketplace` · `freelance service platform` · `MERN stack freelance project` · `freelance platform Pakistan` · `hire freelancers online` · `service marketplace` · `freelance gig platform` · `skill marketplace` · `talent marketplace` · `freelance management system` · `React freelance marketplace` · `Socket.io chat application` · `Gantt chart project management` · `MERN stack portfolio project` · `React Node.js MongoDB Express` · `freelancer client portal` · `online freelancing platform` · `Cloudinary image upload` · `Google OAuth MERN` · `JWT authentication React`
+freelance marketplace · service platform · MERN stack · React developer · Socket.io chat · Gantt chart · project management · portfolio project · Node.js · MongoDB · Express · Tailwind CSS · Cloudinary upload · Google OAuth · JWT authentication · currency converter · client portal · fullstack JavaScript
 
 ---
 
