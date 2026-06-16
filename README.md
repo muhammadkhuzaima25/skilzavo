@@ -64,15 +64,6 @@ Freelance marketplaces often suffer from three core issues:
 
 Skilzavo solves all three with real-time Socket.io chat embedded in project timelines, Gantt-chart phase tracking, and dedicated role-based dashboards tailored for customers, providers, and admins.
 
----
-
-## 🖥️ UI Preview
-
-<p align="center">
-  <img src="client/public/Skilzavo_dashboard.svg" alt="Skilzavo Logo" width="200">
-</p>
-
----
 
 ## ✨ Key Features
 
