@@ -1,5 +1,5 @@
 <p align="center">
-  <img alt="Skilzavo — Freelance Service Marketplace" src="./client/public/Skilzavo_logo.svg" " width="120" style="border-radius: 20px;">
+  <img alt="Skilzavo — Freelance Service Marketplace" src="./client/public/Skilzavo_favicon.svg" " width="120" style="border-radius: 20px;">
 </p>
 
 <h1 align="center">Skil<span style="color:#0A7C72">zavo</span></h1>
