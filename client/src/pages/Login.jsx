@@ -55,7 +55,8 @@ const Login = () => {
           </div>
         )}
 
-        <div className="mb-5">
+        {/* FIX: Google Button Container with full width forcing */}
+        <div className="mb-5 flex justify-center w-full [&>div]:w-full">
           <GoogleLogin
             onSuccess={handleGoogleSuccess}
             onError={() => setError('Google sign-in failed')}
@@ -63,7 +64,7 @@ const Login = () => {
             size="large"
             text="signin_with"
             shape="rectangular"
-            width="100%"
+            width="384" 
           />
         </div>
 
