@@ -21,7 +21,8 @@ export const register = async (req, res) => {
       name: user.name,
       email: user.email,
       role: user.role,
-      avatar: user.avatar,
+      avatar: user.avatar || '',
+      profilePicture: user.profilePicture || user.avatar || '',
       token: generateToken(user._id),
     });
   } catch (error) {
@@ -41,7 +42,8 @@ export const login = async (req, res) => {
       name: user.name,
       email: user.email,
       role: user.role,
-      avatar: user.avatar,
+      avatar: user.avatar || '',
+      profilePicture: user.profilePicture || user.avatar || '',
       token: generateToken(user._id),
     });
   } catch (error) {
@@ -60,7 +62,7 @@ export const getMe = async (req, res) => {
 
 export const updateProfile = async (req, res) => {
   try {
-    const fields = ['name', 'bio', 'skills', 'experience', 'hourlyRate', 'portfolio', 'avatar', 'username', 'phone', 'location', 'languages', 'portfolioWebsite', 'linkedinUrl', 'githubUrl', 'fiverrUrl'];
+    const fields = ['name', 'bio', 'skills', 'experience', 'hourlyRate', 'portfolio', 'avatar', 'profilePicture', 'username', 'phone', 'location', 'languages', 'portfolioWebsite', 'linkedinUrl', 'githubUrl', 'fiverrUrl'];
     const updates = {};
     for (const field of fields) {
       if (req.body[field] !== undefined) {
@@ -68,6 +70,7 @@ export const updateProfile = async (req, res) => {
       }
     }
     if (req.file) {
+      updates.profilePicture = req.file.path;
       updates.avatar = req.file.path;
     }
     const user = await User.findByIdAndUpdate(req.user._id, updates, { new: true });
@@ -165,7 +168,7 @@ export const uploadProfilePicture = async (req, res) => {
     }
     const user = await User.findByIdAndUpdate(
       req.user._id,
-      { profilePicture: req.file.path },
+      { profilePicture: req.file.path, avatar: req.file.path },
       { new: true }
     );
     res.json(user);
@@ -178,7 +181,7 @@ export const deleteProfilePicture = async (req, res) => {
   try {
     const user = await User.findByIdAndUpdate(
       req.user._id,
-      { profilePicture: '' },
+      { profilePicture: '', avatar: '' },
       { new: true }
     );
     res.json(user);
@@ -221,6 +224,7 @@ export const googleAuth = async (req, res) => {
       email: user.email,
       role: user.role,
       avatar: user.avatar || picture,
+      profilePicture: user.profilePicture || user.avatar || picture,
       token: generateToken(user._id),
     });
   } catch (error) {
