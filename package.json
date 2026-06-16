@@ -1,10 +1,12 @@
 {
   "name": "skilzavo-server",
   "version": "1.0.0",
+  "description": "Skilzavo Express Backend",
+  "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "build": "echo 'Express backend preparation complete'"
+    "build": "echo 'Express backend ready'"
   },
   "dependencies": {
     "express": "^4.19.2",
