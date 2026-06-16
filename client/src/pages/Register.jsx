@@ -50,7 +50,8 @@ const Register = () => {
           <div className="bg-red-50 text-red-600 text-sm px-4 py-3 rounded-lg mb-4">{error}</div>
         )}
 
-        <div className="mb-5">
+        {/* FIX: Google Button Container with full width forcing */}
+        <div className="mb-5 flex justify-center w-full [&>div]:w-full">
           <GoogleLogin
             onSuccess={handleGoogleSuccess}
             onError={() => setError('Google sign-up failed')}
@@ -58,7 +59,7 @@ const Register = () => {
             size="large"
             text="signup_with"
             shape="rectangular"
-            width="100%"
+            width="384"
           />
         </div>
 
