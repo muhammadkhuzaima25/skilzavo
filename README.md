@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <a href="https://skilzavo.vercel.app"><img src="https://img.shields.io/badge/🚀_Live_Demo-skilzavo.vercel.app-84CC16?style=for-the-badge&labelColor=0f172a" alt="Live Demo"></a>
+  <a href="https://skilzavo.vercel.app"><img src="https://img.shields.io/badge/🚀_Live_Demo-skilzavo.vercel.app-f27405?style=for-the-badge&labelColor=0f172a" alt="Live Demo"></a>
 </p>
 
 <p align="center">
