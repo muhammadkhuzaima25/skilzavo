@@ -335,10 +335,6 @@ Messages are persisted in MongoDB and fetched via REST API (`GET /api/messages/:
 
 ---
 
-## 🔍 SEO Keywords
-freelance marketplace · service platform · MERN stack · React developer · Socket.io chat · Gantt chart · project management · portfolio project · Node.js · MongoDB · Express · Tailwind CSS · Cloudinary upload · Google OAuth · JWT authentication · currency converter · client portal · fullstack JavaScript
-
----
 
 ## 👤 Author
 
