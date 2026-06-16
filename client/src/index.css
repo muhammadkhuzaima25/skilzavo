@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #0A7C72;
+  --primary-dark: #065F55;
+  --primary-light: #0D9488;
+  --accent: #F97316;
+  --bg-white: #FFFFFF;
+  --bg-section: #F0FDFA;
+  --text-dark: #111827;
+  --text-muted: #6B7280;
+  --border: #E5E7EB;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  color: #111827;
+  background-color: #ffffff;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}

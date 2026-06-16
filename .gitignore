@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+
+# Environment files (secrets / keys)
+.env
+.env.local
+.env.production
+
+# Build output
+dist/
+build/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Vercel deployment
+.vercel
+
+# Uploaded files (local dev)
+server/uploads/*
+!server/uploads/.gitkeep
+
+# Misc
+*.pid
+*.seed
