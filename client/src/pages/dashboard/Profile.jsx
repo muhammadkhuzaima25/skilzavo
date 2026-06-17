@@ -149,12 +149,13 @@ const Profile = () => {
   const submitPersonalInfo = async (e) => {
     e.preventDefault()
     try {
-      const fd = new FormData()
-      fd.append('name', personalInfo.name)
-      fd.append('phone', personalInfo.phone)
-      fd.append('location', personalInfo.location)
-      fd.append('bio', personalInfo.bio)
-      const res = await API.put('/api/auth/profile', fd)
+      const payload = {
+        name: personalInfo.name,
+        phone: personalInfo.phone,
+        location: personalInfo.location,
+        bio: personalInfo.bio
+      }
+      const res = await API.put('/api/auth/profile', payload)
       updateUser(res.data)
       showToast('Personal info updated')
     } catch (err) {
@@ -165,16 +166,17 @@ const Profile = () => {
   const submitProfInfo = async (e) => {
     e.preventDefault()
     try {
-      const fd = new FormData()
-      fd.append('skills', JSON.stringify(profInfo.skills))
-      fd.append('experience', profInfo.experience)
-      fd.append('hourlyRate', String(profInfo.hourlyRate))
-      fd.append('languages', JSON.stringify(profInfo.languages))
-      fd.append('portfolioWebsite', profInfo.portfolioWebsite)
-      fd.append('linkedinUrl', profInfo.linkedinUrl)
-      fd.append('githubUrl', profInfo.githubUrl)
-      fd.append('fiverrUrl', profInfo.fiverrUrl)
-      const res = await API.put('/api/auth/profile', fd)
+      const payload = {
+        skills: profInfo.skills,
+        experience: profInfo.experience,
+        hourlyRate: Number(profInfo.hourlyRate) || 0,
+        languages: profInfo.languages,
+        portfolioWebsite: profInfo.portfolioWebsite,
+        linkedinUrl: profInfo.linkedinUrl,
+        githubUrl: profInfo.githubUrl,
+        fiverrUrl: profInfo.fiverrUrl
+      }
+      const res = await API.put('/api/auth/profile', payload)
       updateUser(res.data)
       showToast('Professional info updated')
     } catch (err) {
