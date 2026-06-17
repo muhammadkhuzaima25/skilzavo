@@ -30,9 +30,12 @@ const ProviderProfile = () => {
     if (Array.isArray(data)) return data;
     try {
       const parsed = JSON.parse(data);
-      return Array.isArray(parsed) ? parsed : [parsed];
+      return Array.isArray(parsed) ? parsed : [];
     } catch {
-      return data.split(',').map(s => s.trim()).filter(Boolean);
+      if (typeof data === 'string') {
+        return data.replace(/[\[\]"']/g, '').split(',').map(s => s.trim()).filter(Boolean);
+      }
+      return [];
     }
   };
 
@@ -48,11 +51,11 @@ const ProviderProfile = () => {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 md:p-8 mb-6">
           <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
-            <div className="w-24 h-24 rounded-full bg-primary-50 flex items-center justify-center overflow-hidden">
+            <div className="w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden border border-gray-200 shadow-inner">
               {provider.profilePicture ? (
-                <img src={provider.profilePicture} alt={provider.name} className="w-full h-full object-cover" />
+                <img src={provider.profilePicture} alt="" className="w-full h-full object-cover" />
               ) : (
-                <span className="text-primary font-bold text-3xl">
+                <span className="text-teal-700 font-bold text-3xl">
                   {provider.name?.charAt(0).toUpperCase() || '?'}
                 </span>
               )}
@@ -68,11 +71,11 @@ const ProviderProfile = () => {
                   <span className="text-gray-400 text-sm">({provider.totalReviews || 0} reviews)</span>
                 </div>
               </div>
-              <p className="text-gray-500 mt-3">{provider.bio || 'No bio yet.'}</p>
+              <p className="text-gray-500 mt-3 text-sm leading-relaxed">{provider.bio || 'No bio yet.'}</p>
               {cleanSkills.length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-3 justify-center md:justify-start">
+                <div className="flex flex-wrap gap-2 mt-4 justify-center md:justify-start">
                   {cleanSkills.map((skill, i) => (
-                    <span key={i} className="bg-primary-50 text-primary-dark text-xs px-3 py-1 rounded-full font-medium border border-gray-100">
+                    <span key={i} className="bg-teal-50 text-teal-700 text-xs px-3 py-1 rounded-full font-medium border border-teal-100 shadow-sm">
                       {skill}
                     </span>
                   ))}
@@ -97,7 +100,7 @@ const ProviderProfile = () => {
                       className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded bg-primary-50 flex items-center justify-center text-primary font-bold text-sm">
+                        <div className="w-10 h-10 rounded bg-teal-50 flex items-center justify-center text-teal-700 font-bold text-sm">
                           {svc.title?.charAt(0) || 'S'}
                         </div>
                         <div>
@@ -105,7 +108,7 @@ const ProviderProfile = () => {
                           <p className="text-xs text-gray-400">{svc.category}</p>
                         </div>
                       </div>
-                      <span className="font-heading font-bold text-primary">{formatPrice(svc.price)}</span>
+                      <span className="font-heading font-bold text-teal-700">{formatPrice(svc.price)}</span>
                     </Link>
                   ))}
                 </div>
