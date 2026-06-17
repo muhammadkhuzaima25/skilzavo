@@ -1,4 +1,5 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { CurrencyProvider } from './context/CurrencyContext';
 import Navbar from './components/Navbar';
@@ -22,6 +23,16 @@ import ManageOrders from './components/provider/ManageOrders';
 import Portfolio from './components/provider/Portfolio';
 import Messages from './components/provider/Messages';
 import TimelineView from './pages/dashboard/TimelineView';
+
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+};
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth();
@@ -98,6 +109,7 @@ const AppContent = () => {
 const App = () => {
   return (
     <Router>
+      <ScrollToTop />
       <AuthProvider>
         <CurrencyProvider>
           <AppContent />
