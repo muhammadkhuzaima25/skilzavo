@@ -1,134 +1,188 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, ScrollView, Alert, Switch } from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
-import { Ionicons } from '@expo/vector-icons';
+import { useState, useEffect } from 'react';
+import { useParams, Link } from 'react-router-dom';
+import ReviewCard from '../components/ReviewCard';
+import { useCurrency } from '../context/CurrencyContext';
+import API from '../utils/axios';
 
-export default function ProviderProfilePage() {
-  const [businessName, setBusinessName] = useState('Quick Fix Plumbing');
-  const [category, setCategory] = useState('Plumbing Services');
-  const [experience, setExperience] = useState('5 Years');
-  const [bio, setBio] = useState('Professional plumbing services including leak repairs, pipe installations, and emergency fixes.');
-  const [isAvailable, setIsAvailable] = useState(true);
-  const [image, setImage] = useState(null);
-  const [isEditing, setIsEditing] = useState(false);
+const ProviderProfile = () => {
+  const { id } = useParams();
+  const { formatPrice, currency } = useCurrency();
+  const [provider, setProvider] = useState(null);
+  const [reviews, setReviews] = useState([]);
+  const [services, setServices] = useState([]);
 
-  const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 1,
-    });
+  useEffect(() => {
+    API.get(`/api/auth/providers/${id}`)
+      .then((res) => {
+        setProvider(res.data);
+        return API.get(`/api/services`, { params: { provider: id } });
+      })
+      .then((res) => setServices(res.data))
+      .catch(() => {});
 
-    if (!result.canceled) {
-      setImage(result.assets[0].uri);
+    API.get(`/api/reviews/${id}`)
+      .then((res) => setReviews(res.data))
+      .catch(() => {});
+  }, [id]);
+
+  const parseArrayData = (data) => {
+    if (!data) return [];
+    if (Array.isArray(data)) return data;
+    try {
+      const parsed = JSON.parse(data);
+      return Array.isArray(parsed) ? parsed : [parsed];
+    } catch {
+      return data.split(',').map(s => s.trim()).filter(Boolean);
     }
   };
 
-  const handleSave = () => {
-    setIsEditing(false);
-    Alert.alert('Success', 'Business profile updated successfully');
-  };
+  if (!provider) {
+    return <div className="min-h-screen flex items-center justify-center text-gray-400">Loading...</div>;
+  }
+
+  const cleanSkills = parseArrayData(provider.skills);
+  const cleanLanguages = parseArrayData(provider.languages);
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={pickImage} disabled={!isEditing}>
-          <View style={styles.imageContainer}>
-            {image ? (
-              <Image source={{ uri: image }} style={styles.profileImage} />
-            ) : (
-              <View style={styles.placeholderImage}>
-                <Ionicons name="briefcase" size={60} color="#ccc" />
-              </View>
+    <div className="min-h-screen bg-white py-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 md:p-8 mb-6">
+          <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
+            <div className="w-24 h-24 rounded-full bg-primary-50 flex items-center justify-center overflow-hidden">
+              {provider.profilePicture ? (
+                <img src={provider.profilePicture} alt={provider.name} className="w-full h-full object-cover" />
+              ) : (
+                <span className="text-primary font-bold text-3xl">
+                  {provider.name?.charAt(0).toUpperCase() || '?'}
+                </span>
+              )}
+            </div>
+            <div className="flex-1 text-center md:text-left">
+              <h1 className="font-heading text-2xl font-bold text-gray-800">{provider.name}</h1>
+              <div className="flex items-center justify-center md:justify-start gap-2 mt-1">
+                <div className="flex items-center gap-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                  <span className="text-sm font-medium text-gray-700">{provider.rating || '0.0'}</span>
+                  <span className="text-gray-400 text-sm">({provider.totalReviews || 0} reviews)</span>
+                </div>
+              </div>
+              <p className="text-gray-500 mt-3">{provider.bio || 'No bio yet.'}</p>
+              {cleanSkills.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-3 justify-center md:justify-start">
+                  {cleanSkills.map((skill, i) => (
+                    <span key={i} className="bg-primary-50 text-primary-dark text-xs px-3 py-1 rounded-full font-medium border border-gray-100">
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-6">
+            <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+              <h2 className="font-heading font-semibold text-lg text-gray-800 mb-4">Services</h2>
+              {services.length === 0 ? (
+                <p className="text-gray-400 text-sm">No services listed yet.</p>
+              ) : (
+                <div className="space-y-3">
+                  {services.map((svc) => (
+                    <Link
+                      key={svc._id}
+                      to={`/services/${svc._id}`}
+                      className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded bg-primary-50 flex items-center justify-center text-primary font-bold text-sm">
+                          {svc.title?.charAt(0) || 'S'}
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-800 text-sm">{svc.title}</p>
+                          <p className="text-xs text-gray-400">{svc.category}</p>
+                        </div>
+                      </div>
+                      <span className="font-heading font-bold text-primary">{formatPrice(svc.price)}</span>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+              <h2 className="font-heading font-semibold text-lg text-gray-800 mb-4">
+                Reviews ({reviews.length})
+              </h2>
+              {reviews.length === 0 ? (
+                <p className="text-gray-400 text-sm">No reviews yet.</p>
+              ) : (
+                <div className="space-y-4">
+                  {reviews.map((r) => (
+                    <ReviewCard key={r._id} review={r} />
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+              <h3 className="font-heading font-semibold text-gray-800 mb-4">Info</h3>
+              <div className="space-y-4 text-sm">
+                {provider.experience && (
+                  <div>
+                    <p className="text-gray-400 text-xs mb-0.5">Experience</p>
+                    <p className="font-medium text-gray-800">{provider.experience}</p>
+                  </div>
+                )}
+                {provider.hourlyRate > 0 && (
+                  <div>
+                    <p className="text-gray-400 text-xs mb-0.5">Hourly Rate</p>
+                    <p className="font-medium text-gray-800">${provider.hourlyRate}/hr</p>
+                  </div>
+                )}
+                {cleanLanguages.length > 0 && (
+                  <div>
+                    <p className="text-gray-400 text-xs mb-1.5">Languages</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {cleanLanguages.map((lang, i) => (
+                        <span key={i} className="bg-teal-50 text-teal-700 border border-teal-100 px-2.5 py-0.5 rounded text-xs font-medium">
+                          {lang}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                <div>
+                  <p className="text-gray-400 text-xs mb-0.5">Member Since</p>
+                  <p className="font-medium text-gray-800">
+                    {new Date(provider.createdAt).toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {provider.portfolio?.length > 0 && (
+              <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+                <h3 className="font-heading font-semibold text-gray-800 mb-4">Portfolio</h3>
+                <div className="space-y-3">
+                  {provider.portfolio.map((item, i) => (
+                    <div key={i} className="p-3 bg-gray-50 rounded-lg">
+                      <p className="font-medium text-sm text-gray-800">{item.title}</p>
+                      {item.description && <p className="text-xs text-gray-500">{item.description}</p>}
+                    </div>
+                  ))}
+                </div>
+              </div>
             )}
-            {isEditing && (
-              <View style={styles.cameraIcon}>
-                <Ionicons name="camera" size={20} color="#fff" />
-              </View>
-            )}
-          </View>
-        </TouchableOpacity>
-        <Text style={styles.title}>{businessName}</Text>
-        <Text style={styles.subtitle}>{category}</Text>
-      </View>
-
-      <View style={styles.form}>
-        <View style={styles.statusContainer}>
-          <Text style={styles.statusLabel}>Availability Status</Text>
-          <Switch
-            value={isAvailable}
-            onValueChange={setIsAvailable}
-            trackColor={{ false: '#767577', true: '#28a745' }}
-            thumbColor={isAvailable ? '#fff' : '#f4f3f4'}
-          />
-        </View>
-
-        <Text style={styles.label}>Business / Provider Name</Text>
-        <TextInput
-          style={[styles.input, !isEditing && styles.disabledInput]}
-          value={businessName}
-          onChangeText={setBusinessName}
-          editable={isEditing}
-        />
-
-        <Text style={styles.label}>Service Category</Text>
-        <TextInput
-          style={[styles.input, !isEditing && styles.disabledInput]}
-          value={category}
-          onChangeText={setCategory}
-          editable={isEditing}
-        />
-
-        <Text style={styles.label}>Experience</Text>
-        <TextInput
-          style={[styles.input, !isEditing && styles.disabledInput]}
-          value={experience}
-          onChangeText={setExperience}
-          editable={isEditing}
-        />
-
-        <Text style={styles.label}>Business Bio / Description</Text>
-        <TextInput
-          style={[styles.input, styles.bioInput, !isEditing && styles.disabledInput]}
-          value={bio}
-          onChangeText={setBio}
-          editable={isEditing}
-          multiline
-          numberOfLines={4}
-        />
-
-        {isEditing ? (
-          <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-            <Text style={styles.buttonText}>Save Business Profile</Text>
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity style={styles.editButton} onPress={() => setIsEditing(true)}>
-            <Text style={styles.buttonText}>Edit Business Profile</Text>
-          </TouchableOpacity>
-        )}
-      </View>
-    </ScrollView>
+          </div>
+        </div>
+      </div>
+    </div>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
-  header: { alignItems: 'center', paddingVertical: 30, backgroundColor: '#f1f3f5', borderBottomWidth: 1, borderColor: '#e9ecef' },
-  imageContainer: { width: 120, height: 120, borderRadius: 60, overflow: 'hidden', backgroundColor: '#e1e4e8', justifyContent: 'center', alignItems: 'center', marginBottom: 15, position: 'relative' },
-  profileImage: { width: '100%', height: '100%' },
-  placeholderImage: { justifyContent: 'center', alignItems: 'center' },
-  cameraIcon: { position: 'absolute', bottom: 0, right: 0, backgroundColor: '#28a745', padding: 8, borderRadius: 20 },
-  title: { fontSize: 22, fontWeight: 'bold', color: '#212529' },
-  subtitle: { fontSize: 14, color: '#495057', marginTop: 5 },
-  form: { padding: 20 },
-  statusContainer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#f8f9fa', padding: 15, borderRadius: 8, marginBottom: 10, borderWidth: 1, borderColor: '#edf2f7' },
-  statusLabel: { fontSize: 16, fontWeight: '600', color: '#333' },
-  label: { fontSize: 14, fontWeight: '600', color: '#444', marginBottom: 5, marginTop: 15 },
-  input: { borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 12, fontSize: 16, color: '#333', backgroundColor: '#fff' },
-  bioInput: { height: 100, textAlignVertical: 'top' },
-  disabledInput: { backgroundColor: '#f5f5f5', borderColor: '#e3e3e3', color: '#777' },
-  editButton: { backgroundColor: '#28a745', padding: 15, borderRadius: 8, alignItems: 'center', marginTop: 30 },
-  saveButton: { backgroundColor: '#007bff', padding: 15, borderRadius: 8, alignItems: 'center', marginTop: 30 },
-  buttonText: { color: '#fff', fontSize: 16, fontWeight: 'bold' }
-});
+export default ProviderProfile;
