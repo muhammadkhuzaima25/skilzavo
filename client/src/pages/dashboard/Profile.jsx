@@ -24,8 +24,18 @@ const Profile = () => {
     if (!data) return [];
     if (Array.isArray(data)) return data;
     try {
-      return JSON.parse(data);
+      const parsed = JSON.parse(data);
+      return Array.isArray(parsed) ? parsed : [];
     } catch {
+      if (typeof data === 'string' && (data.startsWith('[') || data.includes('"'))) {
+        try {
+          const cleanedString = data.replace(/'/g, '"');
+          const finalParsed = JSON.parse(cleanedString);
+          if (Array.isArray(finalParsed)) return finalParsed;
+        } catch {
+          return data.replace(/[\[\]"']/g, '').split(',').map(s => s.trim()).filter(Boolean);
+        }
+      }
       return data.split(',').map(s => s.trim()).filter(Boolean);
     }
   };
@@ -53,6 +63,31 @@ const Profile = () => {
   })
 
   const [stats, setStats] = useState({ services: 0, orders: 0, rating: 0 })
+
+  useEffect(() => {
+    if (user) {
+      setPersonalInfo({
+        name: user.name || '',
+        username: user.username || '',
+        email: user.email || '',
+        phone: user.phone || '',
+        location: user.location || '',
+        bio: user.bio || '',
+      });
+      setProfInfo({
+        skills: parseJsonArray(user.skills),
+        skillInput: '',
+        experience: user.experience || '',
+        hourlyRate: user.hourlyRate || '',
+        languages: parseJsonArray(user.languages),
+        langInput: '',
+        portfolioWebsite: user.portfolioWebsite || '',
+        linkedinUrl: user.linkedinUrl || '',
+        githubUrl: user.githubUrl || '',
+        fiverrUrl: user.fiverrUrl || '',
+      });
+    }
+  }, [user]);
 
   useEffect(() => {
     API.get('/api/services/my-services').then(r => setStats(s => ({ ...s, services: r.data.length }))).catch(() => {})
@@ -170,14 +205,14 @@ const Profile = () => {
   }
 
   const addSkill = () => {
-    const s = profInfo.skillInput.trim()
+    const s = profInfo.skillInput.trim().replace(/[\[\]"']/g, '')
     if (s && !profInfo.skills.includes(s)) {
       setProfInfo({ ...profInfo, skills: [...profInfo.skills, s], skillInput: '' })
     }
   }
 
   const addLanguage = () => {
-    const l = profInfo.langInput.trim()
+    const l = profInfo.langInput.trim().replace(/[\[\]"']/g, '')
     if (l && !profInfo.languages.includes(l)) {
       setProfInfo({ ...profInfo, languages: [...profInfo.languages, l], langInput: '' })
     }
@@ -193,11 +228,11 @@ const Profile = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="col-span-1">
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 text-center h-fit">
-            <div className="w-[120px] h-[120px] rounded-full bg-primary flex items-center justify-center overflow-hidden mx-auto">
+            <div className="w-[120px] h-[120px] rounded-full bg-gray-200 flex items-center justify-center overflow-hidden mx-auto border border-gray-100">
               {profilePic ? (
                 <img src={profilePic} alt="" className="w-full h-full object-cover" />
               ) : (
-                <span className="text-4xl font-bold text-white">
+                <span className="text-4xl font-bold text-teal-700">
                   {user?.name ? user.name.charAt(0).toUpperCase() : '?'}
                 </span>
               )}
@@ -233,7 +268,7 @@ const Profile = () => {
               type="button"
               onClick={() => fileRef.current?.click()}
               disabled={uploading}
-              className="w-full bg-primary text-white rounded-lg py-2 text-sm font-medium flex items-center justify-center gap-2 hover:bg-primary-dark disabled:opacity-50"
+              className="w-full bg-teal-700 text-white rounded-lg py-2 text-sm font-medium flex items-center justify-center gap-2 hover:bg-teal-800 disabled:opacity-50"
             >
               <Camera size={16} />
               {uploading ? 'Uploading...' : 'Upload Photo'}
@@ -280,7 +315,7 @@ const Profile = () => {
                         type="text"
                         value={personalInfo.name}
                         onChange={(e) => setPersonalInfo({ ...personalInfo, name: e.target.value })}
-                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary-500"
+                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
                       />
                     </div>
                     <div className="col-span-1">
@@ -289,7 +324,7 @@ const Profile = () => {
                         type="text"
                         value={personalInfo.phone}
                         onChange={(e) => setPersonalInfo({ ...personalInfo, phone: e.target.value })}
-                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary-500"
+                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
                       />
                     </div>
                     <div className="col-span-1">
@@ -299,7 +334,7 @@ const Profile = () => {
                         value={personalInfo.location}
                         onChange={(e) => setPersonalInfo({ ...personalInfo, location: e.target.value })}
                         placeholder="City, Country"
-                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary-500"
+                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
                       />
                     </div>
                     <div className="col-span-1">
@@ -327,14 +362,14 @@ const Profile = () => {
                         onChange={(e) => setPersonalInfo({ ...personalInfo, bio: e.target.value })}
                         rows={4}
                         maxLength={500}
-                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary-500 resize-none"
+                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500 resize-none"
                       />
                       <p className="text-xs text-gray-400 text-right mt-1">{personalInfo.bio.length}/500</p>
                     </div>
                   </div>
                   <button
                     type="submit"
-                    className="mt-4 bg-primary text-white px-6 py-2 rounded-lg text-sm hover:bg-primary-dark float-right"
+                    className="mt-4 bg-teal-700 text-white px-6 py-2 rounded-lg text-sm hover:bg-teal-800 float-right"
                   >
                     Save Changes
                   </button>
@@ -349,13 +384,13 @@ const Profile = () => {
                       {profInfo.skills.map((skill) => (
                         <span
                           key={skill}
-                          className="inline-flex items-center gap-1 bg-teal-50 text-teal-700 text-xs px-2 py-1 rounded-full"
+                          className="inline-flex items-center gap-1 bg-teal-50 text-teal-700 text-xs px-2.5 py-1 rounded-full font-medium border border-teal-100"
                         >
                           {skill}
                           <button
                             type="button"
                             onClick={() => setProfInfo({ ...profInfo, skills: profInfo.skills.filter((s) => s !== skill) })}
-                            className="hover:text-red-500"
+                            className="hover:text-red-500 ml-1"
                           >
                             <X size={12} />
                           </button>
@@ -369,9 +404,9 @@ const Profile = () => {
                         onChange={(e) => setProfInfo({ ...profInfo, skillInput: e.target.value })}
                         onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addSkill() } }}
                         placeholder="Type a skill and press Enter"
-                        className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary-500"
+                        className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
                       />
-                      <button type="button" onClick={addSkill} disabled={!profInfo.skillInput.trim()} className="bg-primary text-white px-4 py-2 rounded-lg text-sm hover:bg-primary-dark disabled:bg-gray-300">
+                      <button type="button" onClick={addSkill} disabled={!profInfo.skillInput.trim()} className="bg-teal-700 text-white px-4 py-2 rounded-lg text-sm hover:bg-teal-800 disabled:bg-gray-300">
                         <Plus size={16} />
                       </button>
                     </div>
@@ -383,7 +418,7 @@ const Profile = () => {
                       <select
                         value={profInfo.experience}
                         onChange={(e) => setProfInfo({ ...profInfo, experience: e.target.value })}
-                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary-500"
+                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
                       >
                         <option value="">Select experience</option>
                         <option>Less than 1 year</option>
@@ -403,7 +438,7 @@ const Profile = () => {
                           onChange={(e) => setProfInfo({ ...profInfo, hourlyRate: e.target.value })}
                           placeholder="0"
                           min="0"
-                          className="w-full border border-gray-200 rounded-lg pl-8 pr-3 py-2 text-sm focus:outline-none focus:border-primary-500"
+                          className="w-full border border-gray-200 rounded-lg pl-8 pr-3 py-2 text-sm focus:outline-none focus:border-teal-500"
                         />
                       </div>
                     </div>
@@ -415,13 +450,13 @@ const Profile = () => {
                       {profInfo.languages.map((lang) => (
                         <span
                           key={lang}
-                          className="inline-flex items-center gap-1 bg-teal-50 text-teal-700 text-xs px-2 py-1 rounded-full"
+                          className="inline-flex items-center gap-1 bg-teal-50 text-teal-700 text-xs px-2.5 py-1 rounded-full font-medium border border-teal-100"
                         >
                           {lang}
                           <button
                             type="button"
                             onClick={() => setProfInfo({ ...profInfo, languages: profInfo.languages.filter((l) => l !== lang) })}
-                            className="hover:text-red-500"
+                            className="hover:text-red-500 ml-1"
                           >
                             <X size={12} />
                           </button>
@@ -435,9 +470,9 @@ const Profile = () => {
                         onChange={(e) => setProfInfo({ ...profInfo, langInput: e.target.value })}
                         onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addLanguage() } }}
                         placeholder="Type a language and press Enter"
-                        className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary-500"
+                        className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
                       />
-                      <button type="button" onClick={addLanguage} disabled={!profInfo.langInput.trim()} className="bg-primary text-white px-4 py-2 rounded-lg text-sm hover:bg-primary-dark disabled:bg-gray-300">
+                      <button type="button" onClick={addLanguage} disabled={!profInfo.langInput.trim()} className="bg-teal-700 text-white px-4 py-2 rounded-lg text-sm hover:bg-teal-800 disabled:bg-gray-300">
                         <Plus size={16} />
                       </button>
                     </div>
@@ -453,7 +488,7 @@ const Profile = () => {
                         value={profInfo.portfolioWebsite}
                         onChange={(e) => setProfInfo({ ...profInfo, portfolioWebsite: e.target.value })}
                         placeholder="https://yourportfolio.com"
-                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary-500"
+                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
                       />
                     </div>
                     <div>
@@ -463,7 +498,7 @@ const Profile = () => {
                         value={profInfo.linkedinUrl}
                         onChange={(e) => setProfInfo({ ...profInfo, linkedinUrl: e.target.value })}
                         placeholder="https://linkedin.com/in/..."
-                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary-500"
+                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
                       />
                     </div>
                     <div>
@@ -473,7 +508,7 @@ const Profile = () => {
                         value={profInfo.githubUrl}
                         onChange={(e) => setProfInfo({ ...profInfo, githubUrl: e.target.value })}
                         placeholder="https://github.com/..."
-                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary-500"
+                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
                       />
                     </div>
                     <div>
@@ -483,14 +518,14 @@ const Profile = () => {
                         value={profInfo.fiverrUrl}
                         onChange={(e) => setProfInfo({ ...profInfo, fiverrUrl: e.target.value })}
                         placeholder="https://fiverr.com/..."
-                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary-500"
+                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"
                       />
                     </div>
                   </div>
 
                   <button
                     type="submit"
-                    className="mt-4 bg-primary text-white px-6 py-2 rounded-lg text-sm hover:bg-primary-dark float-right"
+                    className="mt-4 bg-teal-700 text-white px-6 py-2 rounded-lg text-sm hover:bg-teal-800 float-right"
                   >
                     Save Changes
                   </button>
@@ -512,7 +547,7 @@ const Profile = () => {
                           value={security[key]}
                           onChange={(e) => setSecurity({ ...security, [key]: e.target.value })}
                           placeholder="••••••••"
-                          className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm pr-10 focus:outline-none focus:border-primary-500"
+                          className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm pr-10 focus:outline-none focus:border-teal-500"
                         />
                         <button
                           type="button"
@@ -539,7 +574,7 @@ const Profile = () => {
 
                   <button
                     type="submit"
-                    className="mt-4 bg-primary text-white px-6 py-2 rounded-lg text-sm hover:bg-primary-dark float-right"
+                    className="mt-4 bg-teal-700 text-white px-6 py-2 rounded-lg text-sm hover:bg-teal-800 float-right"
                   >
                     Update Password
                   </button>
